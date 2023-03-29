@@ -1,6 +1,8 @@
 package br.com.jlgregorio.mybooks.service;
 
+import br.com.jlgregorio.mybooks.dto.CategoryDTO;
 import br.com.jlgregorio.mybooks.exception.ResourceNotFoundException;
+import br.com.jlgregorio.mybooks.mapper.CustomModelMapper;
 import br.com.jlgregorio.mybooks.model.CategoryModel;
 import br.com.jlgregorio.mybooks.repository.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,23 +16,27 @@ public class CategoryService {
     @Autowired
     private CategoryRepository repository;
 
-    public CategoryModel create(CategoryModel model){
-        return repository.save(model);
+    public CategoryDTO create(CategoryDTO dto){
+        CategoryModel model = CustomModelMapper.parseObject(dto, CategoryModel.class);
+        CategoryModel newModel = repository.save(model);
+        return CustomModelMapper.parseObject(newModel, CategoryDTO.class);
+        //return CustomModelMapper.parseObject(repository.save(model), CategoryDTO.class);
     }
 
-    public CategoryModel findById(int id){
-        return repository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Id não encontrado!"));
+    public CategoryDTO findById(int id){
+       CategoryModel model = repository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Não encontrado!"));
+       return CustomModelMapper.parseObject(model, CategoryDTO.class);
     }
 
-    public List<CategoryModel> findAll(){
-        return repository.findAll();
+    public List<CategoryDTO> findAll(){
+        return CustomModelMapper.parseObjectList(repository.findAll(), CategoryDTO.class);
     }
 
-    public CategoryModel update(CategoryModel model){
-        var categoryFound = repository.findById(model.getId())
+    public CategoryDTO update(CategoryDTO dto){
+        var categoryFound = repository.findById(dto.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Não encontrado!"));
-        categoryFound.setName(model.getName());
-        return repository.save(categoryFound);
+        categoryFound = CustomModelMapper.parseObject(dto, CategoryModel.class);
+        return CustomModelMapper.parseObject(repository.save(categoryFound), CategoryDTO.class);
     }
 
     public void delete(int id){

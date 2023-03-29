@@ -1,5 +1,6 @@
 package br.com.jlgregorio.mybooks.controller;
 
+import br.com.jlgregorio.mybooks.dto.CategoryDTO;
 import br.com.jlgregorio.mybooks.model.CategoryModel;
 import br.com.jlgregorio.mybooks.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,23 +18,23 @@ public class CategoryController {
     private CategoryService service;
 
     @PostMapping
-    public CategoryModel create(@RequestBody CategoryModel model){
-        return service.create(model);
+    public CategoryDTO create(@RequestBody CategoryDTO dto){
+        return service.create(dto);
     }
 
     @GetMapping("/{id}")
-    public CategoryModel findById(@PathVariable("id") int id){
+    public CategoryDTO findById(@PathVariable("id") int id){
         return service.findById(id);
     }
 
     @GetMapping
-    public List<CategoryModel> findAll(){
+    public List<CategoryDTO> findAll(){
         return service.findAll();
     }
 
     @PutMapping
-    public CategoryModel update(@RequestBody CategoryModel model){
-        return service.update(model);
+    public CategoryDTO update(@RequestBody CategoryDTO dto){
+        return service.update(dto);
     }
 
     @DeleteMapping("/{id}")
