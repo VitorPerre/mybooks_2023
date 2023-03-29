@@ -26,6 +26,18 @@ public class CategoryService {
         return repository.findAll();
     }
 
+    public CategoryModel update(CategoryModel model){
+        var categoryFound = repository.findById(model.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Não encontrado!"));
+        categoryFound.setName(model.getName());
+        return repository.save(categoryFound);
+    }
+
+    public void delete(int id){
+        var categoryFound = repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Não encontrado!"));
+        repository.delete(categoryFound);
+    }
 
 
 }
