@@ -21,11 +21,11 @@ public class BookModel {
     private String title;
 
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne
     @JoinColumn(name = "author_id", nullable = false)
     private AuthorModel author;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne
     @JoinColumn(name = "category_id", nullable = false)
     private CategoryModel category;
 

@@ -7,11 +7,16 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.IanaLinkRelations;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collection;
 import java.util.List;
 
 @RestController
@@ -40,12 +45,20 @@ public class CategoryController {
 
     @GetMapping("/{id}")
     public CategoryDTO findById(@PathVariable("id") int id){
-        return service.findById(id);
+        CategoryDTO dto = service.findById(id);
+        //..HATEOAS
+        buildSelfLink(dto);
+        return dto;
     }
 
     @GetMapping
-    public List<CategoryDTO> findAll(){
-        return service.findAll();
+    public CollectionModel<CategoryDTO> findAll(){
+        CollectionModel<CategoryDTO> categories = CollectionModel.of(service.findAll());
+        for (CategoryDTO category : categories) {
+            buildSelfLink(category);
+        }
+        buildCollectionLink(categories);
+        return categories;
     }
 
     @PutMapping
@@ -57,6 +70,25 @@ public class CategoryController {
     public ResponseEntity<HttpStatus>delete(@PathVariable("id") int id){
         service.delete(id);
         return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
+    }
+
+    //..build the self link, according to HATEOAS concept
+    public void buildSelfLink(CategoryDTO dto){
+        dto.add(
+                WebMvcLinkBuilder.linkTo(
+                        WebMvcLinkBuilder.methodOn(
+                                this.getClass()
+                        ).findById(dto.getId())
+                ).withSelfRel()
+        );
+    }
+
+    public void buildCollectionLink(CollectionModel<CategoryDTO> categories){
+        categories.add(
+                WebMvcLinkBuilder.linkTo(
+                        WebMvcLinkBuilder.methodOn(this.getClass()).findAll()
+                ).withRel(IanaLinkRelations.COLLECTION)
+        );
     }
 
 
