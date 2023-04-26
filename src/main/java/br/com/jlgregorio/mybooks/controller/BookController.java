@@ -1,38 +1,39 @@
 package br.com.jlgregorio.mybooks.controller;
 
-import br.com.jlgregorio.mybooks.dto.AuthorDTO;
-import br.com.jlgregorio.mybooks.service.AuthorService;
+import br.com.jlgregorio.mybooks.dto.BookDTO;
+import br.com.jlgregorio.mybooks.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.awt.print.Book;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/author/v1")
-public class AuthorController {
+@RequestMapping("/api/book/v1")
+public class BookController {
 
     @Autowired
-    private AuthorService service;
-
-    @PostMapping
-    public AuthorDTO create(@RequestBody AuthorDTO dto){
-        return service.create(dto);
-    }
+    private BookService service;
 
     @GetMapping("/{id}")
-    public AuthorDTO findById(@PathVariable("id") int id){
+    public BookDTO findById(@PathVariable("id") int id){
         return service.findById(id);
     }
 
     @GetMapping
-    public List<AuthorDTO> findAll(){
+    public List<BookDTO> findAll(){
         return service.findAll();
     }
 
+    @PostMapping
+    public BookDTO create(@RequestBody BookDTO dto){
+        return service.create(dto);
+    }
+
     @PutMapping
-    public AuthorDTO update(@RequestBody AuthorDTO dto){
+    public BookDTO update(@RequestBody BookDTO dto){
         return service.update(dto);
     }
 
@@ -41,7 +42,6 @@ public class AuthorController {
         service.delete(id);
         return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
     }
-
 
 
 
