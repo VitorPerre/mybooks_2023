@@ -6,6 +6,8 @@ import br.com.jlgregorio.mybooks.mapper.CustomModelMapper;
 import br.com.jlgregorio.mybooks.model.BookModel;
 import br.com.jlgregorio.mybooks.repository.BookRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,8 +23,10 @@ public class BookService {
         return CustomModelMapper.parseObject(model, BookDTO.class);
     }
 
-    public List<BookDTO> findAll(){
-        return CustomModelMapper.parseObjectList(repository.findAll(), BookDTO.class);
+    public Page<BookDTO> findAll(Pageable pageable){
+        var page = repository.findAll(pageable);
+        //using the map to iterate the objects and execute a method over them
+        return page.map( book -> CustomModelMapper.parseObject(book, BookDTO.class));
     }
 
     public BookDTO create(BookDTO dto){
@@ -41,5 +45,14 @@ public class BookService {
         repository.delete(bookFound);
     }
 
+    public Page<BookDTO> findByAuthor(Pageable pageable, String author){
+        var page = repository.findByAuthorNameStartsWithIgnoreCase(pageable, author);
+        return page.map(book -> CustomModelMapper.parseObject(book, BookDTO.class));
+    }
+
+    public Page<BookDTO> findByTitle(Pageable pageable, String title){
+        var page = repository.findByTitleContainsIgnoreCase(pageable, title);
+        return page.map(book -> CustomModelMapper.parseObject(book, BookDTO.class));
+    }
 
 }

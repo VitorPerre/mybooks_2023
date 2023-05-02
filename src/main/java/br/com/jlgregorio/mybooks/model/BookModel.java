@@ -20,7 +20,6 @@ public class BookModel {
     @Column(length = 100, nullable = false)
     private String title;
 
-
     @ManyToOne
     @JoinColumn(name = "author_id", nullable = false)
     private AuthorModel author;

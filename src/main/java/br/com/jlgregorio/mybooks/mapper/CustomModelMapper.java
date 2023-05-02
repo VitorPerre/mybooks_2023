@@ -1,6 +1,8 @@
 package br.com.jlgregorio.mybooks.mapper;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,5 +22,6 @@ public class CustomModelMapper {
         }
         return destinationList;
     }
+
 
 }
