@@ -6,6 +6,8 @@ import br.com.jlgregorio.mybooks.mapper.CustomModelMapper;
 import br.com.jlgregorio.mybooks.model.CategoryModel;
 import br.com.jlgregorio.mybooks.repository.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -28,8 +30,14 @@ public class CategoryService {
        return CustomModelMapper.parseObject(model, CategoryDTO.class);
     }
 
-    public List<CategoryDTO> findAll(){
-        return CustomModelMapper.parseObjectList(repository.findAll(), CategoryDTO.class);
+    public Page<CategoryDTO> findAll(Pageable pageable){
+        var page = repository.findAll(pageable);
+        return page.map(category -> CustomModelMapper.parseObject(category, CategoryDTO.class));
+    }
+
+    public Page<CategoryDTO> findByName(Pageable pageable, String name){
+        var page = repository.findByNameStartsWithIgnoreCaseOrderByName(pageable, name);
+        return page.map(category -> CustomModelMapper.parseObject(category, CategoryDTO.class));
     }
 
     public CategoryDTO update(CategoryDTO dto){

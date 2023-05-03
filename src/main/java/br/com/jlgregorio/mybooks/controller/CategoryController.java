@@ -7,9 +7,14 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.hateoas.Link;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -52,13 +57,33 @@ public class CategoryController {
     }
 
     @GetMapping
-    public CollectionModel<CategoryDTO> findAll(){
-        CollectionModel<CategoryDTO> categories = CollectionModel.of(service.findAll());
-        for (CategoryDTO category : categories) {
+    public ResponseEntity<PagedModel<CategoryDTO>> findAll(
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size,
+            PagedResourcesAssembler<CategoryDTO> assembler
+    ){
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "name"));
+        var categoriesPage = service.findAll(pageable);
+        for (CategoryDTO category : categoriesPage) {
             buildSelfLink(category);
         }
-        buildCollectionLink(categories);
-        return categories;
+        return new ResponseEntity(assembler.toModel(categoriesPage), HttpStatus.OK);
+    }
+
+    @GetMapping("/find/name")
+    public ResponseEntity<PagedModel<CategoryDTO>> findByName(
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size,
+            @RequestParam(value = "name", defaultValue = "", required = true) String name,
+            PagedResourcesAssembler<CategoryDTO> assembler
+    ){
+        Pageable pageable = PageRequest.of(page, size);
+        var categoriesPage = service.findByName(pageable, name);
+        for (CategoryDTO category : categoriesPage) {
+            buildSelfLink(category);
+        }
+        return new ResponseEntity(assembler.toModel(categoriesPage), HttpStatus.OK);
     }
 
     @PutMapping
@@ -80,14 +105,6 @@ public class CategoryController {
                                 this.getClass()
                         ).findById(dto.getId())
                 ).withSelfRel()
-        );
-    }
-
-    public void buildCollectionLink(CollectionModel<CategoryDTO> categories){
-        categories.add(
-                WebMvcLinkBuilder.linkTo(
-                        WebMvcLinkBuilder.methodOn(this.getClass()).findAll()
-                ).withRel(IanaLinkRelations.COLLECTION)
         );
     }
 
